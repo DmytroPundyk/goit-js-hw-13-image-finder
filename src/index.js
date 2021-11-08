@@ -3,7 +3,12 @@
 import refs from './js/Refs';
 import cardMarkup from "./tamplates/cardMarkup.hbs"
 import * as basicLightbox from 'basiclightbox';
-import './sass/basicLightbox.min.css'
+import './sass/basicLightbox.min.css';
+
+import { info, error } from '@pnotify/core';
+import '@pnotify/core/dist/PNotify.css';
+import '@pnotify/core/dist/BrightTheme.css';
+
 
 refs.form.addEventListener('submit', onFormSubmit);
 refs.loadMoreBtn.addEventListener('click', onLoadMoreBtnClick);
@@ -15,8 +20,15 @@ let page = 1;
 
 function onFormSubmit(e) {
   e.preventDefault();
-  const value = e.currentTarget.elements.query.value;
-  if (!value) {
+   const value = e.currentTarget.elements.query.value;
+   if (value === '') {
+    return info({
+      text: 'Enter the value!',
+      delay: 1500,
+      closerHover: true,
+    });
+  }
+   if (!value) {
     refs.loadMoreBtn.classList.add('is-hidden');
     return refs.list.innerHTML='';
   }
@@ -34,10 +46,20 @@ function onFormSubmit(e) {
       .then(res => res.json())
       .then(data => {
          renderCard(data);
-         refs.loadMoreBtn.classList.remove('is-hidden');
-      });
+        });
+  
+  
 
-  function renderCard({ hits }) {
+   function renderCard({ hits }) {
+      if (hits.length === 0) {
+         refs.loadMoreBtn.classList.add('is-hidden');
+         error({
+        text: 'No matches found!',
+        delay: 1500,
+        closerHover: true,
+      });
+        }
+     refs.loadMoreBtn.classList.remove('is-hidden');
     refs.list.innerHTML = cardMarkup(hits);
   }
 }
@@ -47,7 +69,8 @@ function incrementPage () {
 };
 
 function onLoadMoreBtnClick() {
-  incrementPage();
+   incrementPage();
+
   const BASE_URL = 'https://pixabay.com/api/';
   const queryParam = new URLSearchParams({
     key: '24139890-5ae6ab4edf9c1c1398f9b1185',
@@ -70,7 +93,7 @@ function onLoadMoreBtnClick() {
     const markup = cardMarkup(hits);
     refs.list.insertAdjacentHTML('beforeend', markup);
       
-  }
+}
 }
 const hiddenElement = refs.loadMoreBtn;
 
