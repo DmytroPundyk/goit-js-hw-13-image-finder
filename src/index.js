@@ -18,6 +18,7 @@ refs.goTopBtn.addEventListener('click', backToTop);
 
 let page = 1;
 
+
 function onFormSubmit(e) {
   e.preventDefault();
    const value = e.currentTarget.elements.query.value;
@@ -27,11 +28,8 @@ function onFormSubmit(e) {
       delay: 1500,
       closerHover: true,
     });
-  }
-   if (!value) {
-    refs.loadMoreBtn.classList.add('is-hidden');
-    return refs.list.innerHTML='';
-  }
+   }
+   
   const BASE_URL = 'https://pixabay.com/api/';
   const queryParam = new URLSearchParams({
     key: '24139890-5ae6ab4edf9c1c1398f9b1185',
@@ -45,6 +43,7 @@ function onFormSubmit(e) {
    fetch(`${BASE_URL}?${queryParam}&page=${page}`)
       .then(res => res.json())
       .then(data => {
+           refs.loadMoreBtn.classList.remove('is-hidden');
          renderCard(data);
         });
   
@@ -59,7 +58,6 @@ function onFormSubmit(e) {
         closerHover: true,
       });
         }
-     refs.loadMoreBtn.classList.remove('is-hidden');
     refs.list.innerHTML = cardMarkup(hits);
   }
 }
